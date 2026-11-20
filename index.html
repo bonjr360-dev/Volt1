@@ -60,3 +60,33 @@
 
     <p id="singleResult"></p>
 </section>
+
+<section class="calculator">
+    <h2>Ohm's Law Calculator</h2>
+
+    <label for="ohmsMode">Select parameter to calculate:</label>
+    <select id="ohmsMode">
+        <option value="voltage">Voltage (V)</option>
+        <option value="current">Current (A)</option>
+        <option value="resistance">Resistance (Ω)</option>
+    </select>
+
+    <div>
+        <label id="ohmsLabel1" for="ohmsInput1">Current (A)</label>
+        <input type="number" id="ohmsInput1" placeholder="Enter current" step="any">
+    </div>
+
+    <div>
+        <label id="ohmsLabel2" for="ohmsInput2">Resistance (Ω)</label>
+        <input type="number" id="ohmsInput2" placeholder="Enter resistance" step="any">
+    </div>
+
+    <button id="ohmsCalculateBtn">Calculate</button>
+
+    <p id="ohmsResult">Your result will appear here.</p>
+</section>
+
+console.log(
+    "Ohms calculator:",
+    document.getElementById("ohmsMode")
+);
