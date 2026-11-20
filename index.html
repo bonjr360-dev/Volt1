@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electrical Engineering Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Electrical Engineering Calculator</h1>
+        <p>Your electrical calculations made simple.</p>
+    </header>
+
+    <main>
+        <section class="calculator">
+            <h2>Three-Phase Current Calculator</h2>
+
+            <label for="power">Active Power (kW)</label>
+            <input type="number" id="power" placeholder="Enter power">
+
+            <label for="voltage">Line Voltage (V)</label>
+            <input type="number" id="voltage" placeholder="Enter voltage">
+
+            <label for="pf">Power Factor</label>
+            <input type="number" id="pf" placeholder="e.g. 0.9" step="any">
+
+            <button onclick="calculateCurrent()">
+                Calculate Current
+            </button>
+
+            <h3 id="result">Result will appear here</h3>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
+<section class="calculator">
+    <h2>Single-Phase Current Calculator</h2>
+
+    <label for="singlePower">Power (kW)</label>
+    <input type="number" id="singlePower"
+           placeholder="Enter power in kW" step="any">
+
+    <label for="singleVoltage">Voltage (V)</label>
+    <input type="number" id="singleVoltage"
+           placeholder="Enter voltage" step="any">
+
+    <label for="singlePF">Power Factor</label>
+    <input type="number" id="singlePF"
+           placeholder="Enter power factor"
+           min="0.01" max="1" step="any">
+
+    <button onclick="calculateSinglePhase()">
+        Calculate Current
+    </button>
+
+    <p id="singleResult"></p>
+</section>
