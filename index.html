@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -164,7 +163,7 @@ console.log(
     <label for="vdMaterial">Conductor Material</label>
     <select id="vdMaterial">
         <option value="0.0172">Copper</option>
-        <option value="0.0282">Aluminium</option>
+        <option value="0.0282">Aluminum</option>
     </select>
 
     <button id="vdCalculateBtn">
@@ -172,4 +171,78 @@ console.log(
     </button>
 
     <div id="vdResult"></div>
+</section>
+<!-- ============================= -->
+<!-- CABLE SIZING ASSISTANT -->
+<!-- ============================= -->
+
+<section class="calculator">
+
+    <h2>Cable Sizing Assistant</h2>
+
+    <label for="csSystem">System Type</label>
+    <select id="csSystem">
+        <option value="single">Single Phase</option>
+        <option value="three">Three Phase</option>
+    </select>
+
+    <label for="csVoltage">Supply Voltage (V)</label>
+    <input
+        type="number"
+        id="csVoltage"
+        placeholder="Enter supply voltage"
+        min="1"
+        step="any"
+    >
+
+    <label for="csPower">Load Power (kW)</label>
+    <input
+        type="number"
+        id="csPower"
+        placeholder="Enter load power"
+        min="0.01"
+        step="any"
+    >
+
+    <label for="csPF">Power Factor</label>
+    <input
+        type="number"
+        id="csPF"
+        placeholder="Enter power factor (0 - 1)"
+        min="0.01"
+        max="1"
+        step="any"
+    >
+
+    <label for="csMaterial">Conductor Material</label>
+    <select id="csMaterial">
+        <option value="0.0172">Copper</option>
+        <option value="0.0282">Aluminum</option>
+    </select>
+
+    <label for="csLength">Cable Length (m)</label>
+    <input
+        type="number"
+        id="csLength"
+        placeholder="Enter cable length"
+        min="0.1"
+        step="any"
+    >
+
+    <label for="csMaxDrop">Maximum Voltage Drop (%)</label>
+    <input
+        type="number"
+        id="csMaxDrop"
+        value="5"
+        min="0.1"
+        max="100"
+        step="any"
+    >
+
+    <button id="csCalculateBtn">
+        Calculate Cable Size
+    </button>
+
+    <div id="csResult"></div>
+
 </section>

@@ -321,3 +321,218 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+// ==========================================
+// CABLE SIZING ASSISTANT
+// ==========================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const system = document.getElementById("csSystem");
+    const voltage = document.getElementById("csVoltage");
+    const power = document.getElementById("csPower");
+    const pf = document.getElementById("csPF");
+    const material = document.getElementById("csMaterial");
+    const length = document.getElementById("csLength");
+    const maxDrop = document.getElementById("csMaxDrop");
+
+    const button = document.getElementById("csCalculateBtn");
+    const result = document.getElementById("csResult");
+
+    // STANDARD CABLE SIZES
+    const cableSizes = [
+        1.5, 2.5, 4, 6, 10, 16, 25, 35,
+        50, 70, 95, 120, 150, 185, 240
+    ];
+
+    // CALCULATE CABLE SIZE
+    button.addEventListener("click", function () {
+
+        const V = Number(voltage.value);
+        const P = Number(power.value) * 1000;
+        const PF = Number(pf.value);
+        const L = Number(length.value);
+        const rho = Number(material.value);
+        const allowedDrop = Number(maxDrop.value);
+
+        // INPUT VALIDATION
+        if (
+            voltage.value === "" ||
+            power.value === "" ||
+            pf.value === "" ||
+            length.value === "" ||
+            maxDrop.value === ""
+        ) {
+            result.innerHTML = "Please fill in all required fields.";
+            return;
+        }
+
+        if (
+            V <= 0 ||
+            P <= 0 ||
+            PF <= 0 ||
+            PF > 1 ||
+            L <= 0 ||
+            allowedDrop <= 0
+        ) {
+            result.innerHTML = "Please enter valid values.";
+            return;
+        }
+
+        // ==================================
+        // STEP 1: CALCULATE LOAD CURRENT
+        // ==================================
+
+        let current;
+
+        if (system.value === "single") {
+
+            current = P / (V * PF);
+
+        } else {
+
+            current = P / (Math.sqrt(3) * V * PF);
+
+        }
+
+        // ==================================
+        // STEP 2: CALCULATE ALLOWABLE DROP
+        // ==================================
+
+        const maxVoltageDrop = V * (allowedDrop / 100);
+
+        // ==================================
+        // STEP 3: FIND REQUIRED CABLE SIZE
+        // ==================================
+
+        let selectedCable = null;
+
+        for (let A of cableSizes) {
+
+            let voltageDrop;
+
+            if (system.value === "single") {
+
+                voltageDrop = (2 * L * current * rho) / A;
+
+            } else {
+
+                voltageDrop = (Math.sqrt(3) * L * current * rho) / A;
+
+            }
+
+            if (voltageDrop <= maxVoltageDrop) {
+
+                selectedCable = A;
+                break;
+
+            }
+
+        }
+
+        // ==================================
+        // STEP 4: CHECK IF CABLE WAS FOUND
+        // ==================================
+
+        if (selectedCable === null) {
+
+            result.innerHTML = `
+                <h3>Calculation Results</h3>
+
+                <p>
+                    Load Current:
+                    <strong>${current.toFixed(2)} A</strong>
+                </p>
+
+                <p style="color:red;">
+                    No cable size in the available list
+                    satisfies the selected voltage drop limit.
+                </p>
+
+                <p>
+                    Consider a larger conductor or shorter cable length.
+                </p>
+            `;
+
+            return;
+
+        }
+
+        // ==================================
+        // STEP 5: CALCULATE FINAL RESULTS
+        // ==================================
+
+        let finalVoltageDrop;
+
+        if (system.value === "single") {
+
+            finalVoltageDrop =
+                (2 * L * current * rho) / selectedCable;
+
+        } else {
+
+            finalVoltageDrop =
+                (Math.sqrt(3) * L * current * rho) / selectedCable;
+
+        }
+
+        const dropPercentage = (finalVoltageDrop / V) * 100;
+
+        const receivingVoltage = V - finalVoltageDrop;
+
+        // ==================================
+        // STEP 6: DISPLAY RESULTS
+        // ==================================
+
+        result.innerHTML = `
+            <h3>Cable Sizing Results</h3>
+
+            <p>
+                Load Current:
+                <strong>${current.toFixed(2)} A</strong>
+            </p>
+
+            <p>
+                Recommended Cable Size:
+                <strong>${selectedCable} mm²</strong>
+            </p>
+
+            <p>
+                Voltage Drop:
+                <strong>${finalVoltageDrop.toFixed(2)} V</strong>
+            </p>
+
+            <p>
+                Voltage Drop Percentage:
+                <strong>${dropPercentage.toFixed(2)} %</strong>
+            </p>
+
+            <p>
+                Receiving-End Voltage:
+                <strong>${receivingVoltage.toFixed(2)} V</strong>
+            </p>
+
+            <p>
+                Conductor Material:
+                <strong>${material.options[material.selectedIndex].text}</strong>
+            </p>
+
+            <p>
+                Maximum Allowed Voltage Drop:
+                <strong>${allowedDrop}%</strong>
+            </p>
+
+            <p style="color:green;">
+                Cable satisfies the selected voltage-drop limit.
+            </p>
+
+            <small>
+                This calculation is based on conductor resistivity
+                at approximately 20°C. Cable reactance, operating
+                temperature, installation method, grouping, and
+                current-carrying capacity are not included.
+            </small>
+        `;
+
+    });
+
+});
