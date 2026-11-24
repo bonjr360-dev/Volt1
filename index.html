@@ -85,7 +85,19 @@
 
     <p id="ohmsResult">Your result will appear here.</p>
 </section>
+<section class="calculator">
+    <h2>Power Factor Calculator</h2>
 
+    <label for="pfPower">Active Power (kW)</label>
+    <input type="number" id="pfPower" placeholder="Enter active power" step="any">
+
+    <label for="pfApparent">Apparent Power (kVA)</label>
+    <input type="number" id="pfApparent" placeholder="Enter apparent power" step="any">
+
+    <button id="pfCalculateBtn">Calculate Power Factor</button>
+
+    <div id="pfResult"></div>
+</section>
 console.log(
     "Ohms calculator:",
     document.getElementById("ohmsMode")

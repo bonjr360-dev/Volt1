@@ -126,4 +126,38 @@ document.addEventListener("DOMContentLoaded", function () {
 
     updateInputs();
 });
+// POWER FACTOR CALCULATOR
 
+document.addEventListener("DOMContentLoaded", function () {
+
+    const activePowerInput = document.getElementById("pfPower");
+    const apparentPowerInput = document.getElementById("pfApparent");
+    const calculateButton = document.getElementById("pfCalculateBtn");
+    const result = document.getElementById("pfResult");
+
+    calculateButton.addEventListener("click", function () {
+
+        const P = Number(activePowerInput.value);
+        const S = Number(apparentPowerInput.value);
+
+        if (activePowerInput.value === "" || apparentPowerInput.value === "") {
+            result.textContent = "Please enter both power values.";
+            return;
+        }
+
+        if (P <= 0 || S <= 0 || P > S) {
+            result.textContent = "Enter valid values. Active power cannot exceed apparent power.";
+            return;
+        }
+
+        const powerFactor = P / S;
+        const angle = Math.acos(powerFactor) * (180 / Math.PI);
+
+        result.innerHTML = `
+            <h3>Results</h3>
+            <p>Power Factor: <strong>${powerFactor.toFixed(3)}</strong></p>
+            <p>Phase Angle: <strong>${angle.toFixed(2)}°</strong></p>
+        `;
+    });
+
+});
