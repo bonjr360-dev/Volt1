@@ -102,3 +102,74 @@ console.log(
     "Ohms calculator:",
     document.getElementById("ohmsMode")
 );
+<section class="calculator">
+    <h2>Voltage Drop Calculator</h2>
+
+    <label for="vdSystem">Circuit Type</label>
+    <select id="vdSystem">
+        <option value="single">Single Phase</option>
+        <option value="three">Three Phase</option>
+    </select>
+
+    <label for="vdVoltage">Supply Voltage (V)</label>
+    <input
+        type="number"
+        id="vdVoltage"
+        placeholder="Enter supply voltage"
+        min="0"
+        step="any"
+    >
+
+    <label for="vdCurrent">Load Current (A)</label>
+    <input
+        type="number"
+        id="vdCurrent"
+        placeholder="Enter load current"
+        min="0"
+        step="any"
+    >
+
+    <label for="vdLength">Cable Length (m)</label>
+    <input
+        type="number"
+        id="vdLength"
+        placeholder="Enter one-way cable length"
+        min="0"
+        step="any"
+    >
+
+    <label for="vdSize">Cable Size (mm²)</label>
+    <select id="vdSize">
+        <option value="1.5">1.5 mm²</option>
+        <option value="2.5">2.5 mm²</option>
+        <option value="4">4 mm²</option>
+        <option value="6">6 mm²</option>
+        <option value="custom">Other - Enter Manually</option>
+    </select>
+
+    <div id="customSizeContainer" style="display: none;">
+        <label for="customCableSize">
+            Enter Cable Size (mm²)
+        </label>
+
+        <input
+            type="number"
+            id="customCableSize"
+            placeholder="Enter cable cross-sectional area"
+            min="0.1"
+            step="any"
+        >
+    </div>
+
+    <label for="vdMaterial">Conductor Material</label>
+    <select id="vdMaterial">
+        <option value="0.0172">Copper</option>
+        <option value="0.0282">Aluminium</option>
+    </select>
+
+    <button id="vdCalculateBtn">
+        Calculate Voltage Drop
+    </button>
+
+    <div id="vdResult"></div>
+</section>

@@ -161,3 +161,163 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+// =====================================
+// VOLTAGE DROP CALCULATOR
+// =====================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const system = document.getElementById("vdSystem");
+    const voltage = document.getElementById("vdVoltage");
+    const current = document.getElementById("vdCurrent");
+    const length = document.getElementById("vdLength");
+
+    const size = document.getElementById("vdSize");
+    const customContainer = document.getElementById("customSizeContainer");
+    const customInput = document.getElementById("customCableSize");
+
+    const material = document.getElementById("vdMaterial");
+
+    const button = document.getElementById("vdCalculateBtn");
+    const result = document.getElementById("vdResult");
+
+
+    // SHOW OR HIDE CUSTOM CABLE SIZE INPUT
+
+    size.addEventListener("change", function () {
+
+        if (size.value === "custom") {
+
+            customContainer.style.display = "block";
+
+        } else {
+
+            customContainer.style.display = "none";
+            customInput.value = "";
+
+        }
+
+    });
+
+
+    // CALCULATE VOLTAGE DROP
+
+    button.addEventListener("click", function () {
+
+        const V = Number(voltage.value);
+        const I = Number(current.value);
+        const L = Number(length.value);
+
+        const A = size.value === "custom"
+            ? Number(customInput.value)
+            : Number(size.value);
+
+        const rho = Number(material.value);
+
+
+        // INPUT VALIDATION
+
+        if (
+            voltage.value.trim() === "" ||
+            current.value.trim() === "" ||
+            length.value.trim() === ""
+        ) {
+
+            result.textContent = "Please fill in all required fields.";
+            return;
+
+        }
+
+        if (
+            !Number.isFinite(V) ||
+            !Number.isFinite(I) ||
+            !Number.isFinite(L) ||
+            V <= 0 ||
+            I <= 0 ||
+            L <= 0
+        ) {
+
+            result.textContent = "Please enter valid positive values.";
+            return;
+
+        }
+
+        if (size.value === "custom" && customInput.value.trim() === "") {
+
+            result.textContent = "Please enter your cable size.";
+            return;
+
+        }
+
+        if (!Number.isFinite(A) || A <= 0) {
+
+            result.textContent = "Please enter a valid cable size.";
+            return;
+
+        }
+
+
+        // VOLTAGE DROP CALCULATION
+
+        let voltageDrop;
+
+        if (system.value === "single") {
+
+            // Single-phase resistive approximation
+            voltageDrop = (2 * L * I * rho) / A;
+
+        } else {
+
+            // Three-phase resistive approximation
+            voltageDrop = (Math.sqrt(3) * L * I * rho) / A;
+
+        }
+
+
+        // CALCULATE RESULTS
+
+        const dropPercentage = (voltageDrop / V) * 100;
+
+        const receivingVoltage = V - voltageDrop;
+
+
+        // DISPLAY RESULTS
+
+        result.innerHTML = `
+            <h3>Calculation Results</h3>
+
+            <p>
+                Voltage Drop:
+                <strong>${voltageDrop.toFixed(2)} V</strong>
+            </p>
+
+            <p>
+                Voltage Drop Percentage:
+                <strong>${dropPercentage.toFixed(2)}%</strong>
+            </p>
+
+            <p>
+                Receiving-End Voltage:
+                <strong>${receivingVoltage.toFixed(2)} V</strong>
+            </p>
+
+            <p>
+                Cable Size:
+                <strong>${A} mm²</strong>
+            </p>
+
+            <p>
+                Conductor:
+                <strong>${material.options[material.selectedIndex].text}</strong>
+            </p>
+
+            <small>
+                Note: This is an estimated voltage drop using
+                conductor resistivity at approximately 20°C.
+                Cable reactance and operating temperature are not included.
+            </small>
+        `;
+
+    });
+
+});
