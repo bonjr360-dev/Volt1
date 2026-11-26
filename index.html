@@ -304,13 +304,11 @@ console.log(
     <div id="powerTriangle"></div>
 
 </section>
-<!-- ============================= -->
-<!-- ENERGY CONSUMPTION CALCULATOR -->
-<!-- ============================= -->
-
 <section class="calculator">
 
     <h2>Energy Consumption & Cost Calculator</h2>
+
+    <h3>Add Electrical Appliances</h3>
 
     <label for="energyAppliance">Appliance Name</label>
     <input type="text" id="energyAppliance" placeholder="e.g. Water Pump">
@@ -319,11 +317,11 @@ console.log(
     <input type="number" id="energyPower" placeholder="Enter power rating" min="0" step="any">
 
     <label for="energyUnit">Power Unit</label>
-<select id="energyUnit">
-    <option value="W">Watts (W)</option>
-    <option value="kW">Kilowatts (kW)</option>
-    <option value="HP">Horsepower (HP)</option>
-</select>
+    <select id="energyUnit">
+        <option value="W">Watts (W)</option>
+        <option value="kW">Kilowatts (kW)</option>
+        <option value="HP">Horsepower (HP)</option>
+    </select>
 
     <label for="energyQuantity">Quantity</label>
     <input type="number" id="energyQuantity" value="1" min="1" step="1">
@@ -331,13 +329,27 @@ console.log(
     <label for="energyHours">Operating Hours per Day</label>
     <input type="number" id="energyHours" placeholder="Hours per day" min="0" max="24" step="any">
 
+    <div class="energy-buttons">
+    <button id="energyAddBtn">Add Appliance</button>
+
+    <button id="energyCancelEditBtn" style="display: none;">
+        Cancel Edit
+    </button>
+</div>
+
+    <h3>Appliance List</h3>
+
+    <div id="energyApplianceList">
+        <p>No appliances added yet.</p>
+    </div>
+
     <label for="energyDays">Operating Days per Month</label>
     <input type="number" id="energyDays" value="30" min="1" max="31" step="1">
 
     <label for="energyTariff">Electricity Tariff (TZS/kWh)</label>
     <input type="number" id="energyTariff" placeholder="Enter tariff" min="0" step="any">
 
-    <button id="energyCalculateBtn">Calculate Energy & Cost</button>
+    <button id="energyCalculateBtn">Calculate Total Energy & Cost</button>
 
     <div id="energyResult"></div>
 

@@ -729,107 +729,278 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
-// ==========================================
-// ENERGY CONSUMPTION & COST CALCULATOR
-// ==========================================
-
 document.addEventListener("DOMContentLoaded", function () {
 
-    const appliance = document.getElementById("energyAppliance");
-    const power = document.getElementById("energyPower");
-    const unit = document.getElementById("energyUnit");
-    const quantity = document.getElementById("energyQuantity");
-    const hours = document.getElementById("energyHours");
-    const days = document.getElementById("energyDays");
-    const tariff = document.getElementById("energyTariff");
+    const applianceName = document.getElementById("energyAppliance");
+    const powerInput = document.getElementById("energyPower");
+    const unitInput = document.getElementById("energyUnit");
+    const quantityInput = document.getElementById("energyQuantity");
+    const hoursInput = document.getElementById("energyHours");
 
-    const button = document.getElementById("energyCalculateBtn");
+    const daysInput = document.getElementById("energyDays");
+    const tariffInput = document.getElementById("energyTariff");
+
+    const addButton = document.getElementById("energyAddBtn");
+    const cancelButton = document.getElementById("energyCancelEditBtn");
+    const calculateButton = document.getElementById("energyCalculateBtn");
+
+    const applianceList = document.getElementById("energyApplianceList");
     const result = document.getElementById("energyResult");
 
-    button.addEventListener("click", function () {
+    let appliances = [];
+    let editingIndex = -1;
 
-        const P = Number(power.value);
-        const N = Number(quantity.value);
-        const H = Number(hours.value);
-        const D = Number(days.value);
-        const T = Number(tariff.value);
+    function convertToKW(value, unit) {
+        if (unit === "W") return value / 1000;
+        if (unit === "HP") return value * 0.746;
+        return value;
+    }
 
-        // VALIDATION
+    function displayAppliances() {
+
+        if (appliances.length === 0) {
+            applianceList.innerHTML = "<p>No appliances added yet.</p>";
+            return;
+        }
+
+        let table = `
+            <table>
+                <tr>
+                    <th>Appliance</th>
+                    <th>Rated Power</th>
+                    <th>Equivalent Power</th>
+                    <th>Quantity</th>
+                    <th>Hours/Day</th>
+                    <th>Actions</th>
+                </tr>
+        `;
+
+        appliances.forEach((appliance, index) => {
+
+            table += `
+                <tr>
+                    <td>${escapeHTML(appliance.name)}</td>
+                    <td>${appliance.ratedPower} ${appliance.unit}</td>
+                    <td>${appliance.powerKW.toFixed(3)} kW</td>
+                    <td>${appliance.quantity}</td>
+                    <td>${appliance.hours}</td>
+                    <td>
+                        <button data-edit="${index}">Edit</button>
+                        <button data-remove="${index}">Remove</button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        table += "</table>";
+
+        applianceList.innerHTML = table;
+
+        applianceList.querySelectorAll("[data-edit]").forEach(button => {
+            button.addEventListener("click", function () {
+                editAppliance(Number(this.dataset.edit));
+            });
+        });
+
+        applianceList.querySelectorAll("[data-remove]").forEach(button => {
+            button.addEventListener("click", function () {
+                const index = Number(this.dataset.remove);
+
+                appliances.splice(index, 1);
+
+                if (editingIndex === index) {
+                    cancelEdit();
+                } else if (editingIndex > index) {
+                    editingIndex--;
+                }
+
+                displayAppliances();
+            });
+        });
+    }
+
+    function escapeHTML(text) {
+        return String(text).replace(/[&<>"']/g, function (character) {
+            return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#039;"
+            }[character];
+        });
+    }
+
+    function clearInputs() {
+        applianceName.value = "";
+        powerInput.value = "";
+        unitInput.value = "W";
+        quantityInput.value = "1";
+        hoursInput.value = "";
+    }
+
+    function editAppliance(index) {
+
+        const appliance = appliances[index];
+
+        applianceName.value = appliance.name;
+        powerInput.value = appliance.ratedPower;
+        unitInput.value = appliance.unit;
+        quantityInput.value = appliance.quantity;
+        hoursInput.value = appliance.hours;
+
+        editingIndex = index;
+
+        addButton.textContent = "Update Appliance";
+        cancelButton.style.display = "inline-block";
+    }
+
+    function cancelEdit() {
+
+        editingIndex = -1;
+
+        clearInputs();
+
+        addButton.textContent = "Add Appliance";
+        cancelButton.style.display = "none";
+    }
+
+    addButton.addEventListener("click", function () {
+
+        const name = applianceName.value.trim();
+        const power = Number(powerInput.value);
+        const unit = unitInput.value;
+        const quantity = Number(quantityInput.value);
+        const hours = Number(hoursInput.value);
+
         if (
-            power.value.trim() === "" ||
-            hours.value.trim() === "" ||
-            tariff.value.trim() === ""
+            name === "" ||
+            powerInput.value === "" ||
+            quantityInput.value === "" ||
+            hoursInput.value === ""
         ) {
-            result.innerHTML = "Please fill in all required fields.";
+            alert("Please fill in all appliance details.");
             return;
         }
 
         if (
-            P <= 0 ||
-            N <= 0 ||
-            H <= 0 ||
-            H > 24 ||
-            D <= 0 ||
-            D > 31 ||
-            T < 0
+            !Number.isFinite(power) ||
+            power <= 0 ||
+            !Number.isInteger(quantity) ||
+            quantity <= 0 ||
+            !Number.isFinite(hours) ||
+            hours <= 0 ||
+            hours > 24
         ) {
-            result.innerHTML = "Please enter valid values.";
+            alert("Enter valid power, quantity and operating hours.");
             return;
         }
 
-      // CONVERT POWER TO kW
-let powerKW;
+        const appliance = {
+            name: name,
+            ratedPower: power,
+            unit: unit,
+            powerKW: convertToKW(power, unit),
+            quantity: quantity,
+            hours: hours
+        };
 
-if (unit.value === "W") {
-    powerKW = P / 1000;
-} else if (unit.value === "kW") {
-    powerKW = P;
-} else if (unit.value === "HP") {
-    powerKW = P * 0.746;
-}
-        // TOTAL CONNECTED LOAD
-        const totalPower = powerKW * N;
+        if (editingIndex === -1) {
+            appliances.push(appliance);
+        } else {
+            appliances[editingIndex] = appliance;
+            cancelEdit();
+        }
 
-        // ENERGY CALCULATIONS
-        const dailyEnergy = totalPower * H;
-        const monthlyEnergy = dailyEnergy * D;
-        const annualEnergy = dailyEnergy * 365;
+        if (editingIndex === -1) {
+            clearInputs();
+        }
 
-        // COST CALCULATIONS
-        const dailyCost = dailyEnergy * T;
-        const monthlyCost = monthlyEnergy * T;
-        const annualCost = annualEnergy * T;
+        displayAppliances();
+        result.innerHTML = "";
+    });
 
-        // DISPLAY RESULTS
+    cancelButton.addEventListener("click", cancelEdit);
+
+    calculateButton.addEventListener("click", function () {
+
+        if (appliances.length === 0) {
+            alert("Please add at least one appliance.");
+            return;
+        }
+
+        const days = Number(daysInput.value);
+        const tariff = Number(tariffInput.value);
+
+        if (
+            daysInput.value === "" ||
+            !Number.isInteger(days) ||
+            days < 1 ||
+            days > 31 ||
+            tariffInput.value === "" ||
+            !Number.isFinite(tariff) ||
+            tariff < 0
+        ) {
+            alert("Enter valid operating days and electricity tariff.");
+            return;
+        }
+
+        let connectedLoad = 0;
+        let dailyEnergy = 0;
+
+        appliances.forEach(appliance => {
+
+            connectedLoad += appliance.powerKW * appliance.quantity;
+
+            dailyEnergy +=
+                appliance.powerKW *
+                appliance.quantity *
+                appliance.hours;
+        });
+
+        const monthlyEnergy = dailyEnergy * days;
+        const annualEnergy = monthlyEnergy * 12;
+
+        const dailyCost = dailyEnergy * tariff;
+        const monthlyCost = monthlyEnergy * tariff;
+        const annualCost = annualEnergy * tariff;
+
         result.innerHTML = `
             <h3>Energy Consumption Results</h3>
 
-            <p>Appliance: <strong>${appliance.value || "Electrical Load"}</strong></p>
+            <p><strong>Total Appliances:</strong> ${appliances.length}</p>
 
-            <p>Total Connected Load:
-            <strong>${totalPower.toFixed(2)} kW</strong></p>
+            <p><strong>Total Connected Load:</strong>
+            ${connectedLoad.toFixed(3)} kW</p>
 
-            <p>Daily Energy Consumption:
-            <strong>${dailyEnergy.toFixed(2)} kWh</strong></p>
+            <h4>Energy Consumption (Units)</h4>
 
-            <p>Monthly Energy Consumption:
-            <strong>${monthlyEnergy.toFixed(2)} kWh</strong></p>
+            <p><strong>Daily Units:</strong>
+            ${dailyEnergy.toFixed(2)} kWh</p>
 
-            <p>Annual Energy Consumption:
-            <strong>${annualEnergy.toFixed(2)} kWh</strong></p>
+            <p><strong>Monthly Units:</strong>
+            ${monthlyEnergy.toFixed(2)} kWh</p>
 
-            <hr>
+            <p><strong>Annual Units:</strong>
+            ${annualEnergy.toFixed(2)} kWh</p>
 
-            <p>Daily Electricity Cost:
-            <strong>${dailyCost.toLocaleString("en-US", {maximumFractionDigits: 2})} TZS</strong></p>
+            <h4>Estimated Electricity Cost</h4>
 
-            <p>Monthly Electricity Cost:
-            <strong>${monthlyCost.toLocaleString("en-US", {maximumFractionDigits: 2})} TZS</strong></p>
+            <p><strong>Daily Cost:</strong>
+            TZS ${dailyCost.toLocaleString("en-US", {maximumFractionDigits: 2})}</p>
 
-            <p>Annual Electricity Cost:
-            <strong>${annualCost.toLocaleString("en-US", {maximumFractionDigits: 2})} TZS</strong></p>
+            <p><strong>Monthly Cost:</strong>
+            TZS ${monthlyCost.toLocaleString("en-US", {maximumFractionDigits: 2})}</p>
+
+            <p><strong>Annual Cost:</strong>
+            TZS ${annualCost.toLocaleString("en-US", {maximumFractionDigits: 2})}</p>
+
+            <small>One electricity unit equals 1 kWh.
+            Annual estimates assume the same operating days per month
+            throughout the year.</small>
         `;
-
     });
+
+    displayAppliances();
 
 });
