@@ -246,3 +246,61 @@ console.log(
     <div id="csResult"></div>
 
 </section>
+<!-- ============================= -->
+<!-- ELECTRICAL POWER CALCULATOR -->
+<!-- ============================= -->
+
+<section class="calculator">
+
+    <h2>Electrical Power Calculator</h2>
+
+    <label for="powerSystem">System Type</label>
+    <select id="powerSystem">
+        <option value="single">Single Phase</option>
+        <option value="three">Three Phase</option>
+    </select>
+
+    <label for="powerVoltage">Supply Voltage (V)</label>
+    <input
+        type="number"
+        id="powerVoltage"
+        placeholder="Enter supply voltage"
+        min="0"
+        step="any"
+    >
+
+    <label for="powerCurrent">Load Current (A)</label>
+    <input
+        type="number"
+        id="powerCurrent"
+        placeholder="Enter load current"
+        min="0"
+        step="any"
+    >
+
+    <label for="powerPF">Power Factor</label>
+    <input
+        type="number"
+        id="powerPF"
+        placeholder="Enter power factor (0 - 1)"
+        min="0"
+        max="1"
+        step="any"
+    >
+
+    <label for="powerType">Power Factor Type</label>
+    <select id="powerType">
+        <option value="lagging">Lagging</option>
+        <option value="leading">Leading</option>
+        <option value="unity">Unity</option>
+    </select>
+
+    <button id="powerCalculateBtn">
+        Calculate Electrical Power
+    </button>
+
+    <div id="powerResult"></div>
+
+    <div id="powerTriangle"></div>
+
+</section>

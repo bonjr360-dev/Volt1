@@ -536,3 +536,196 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+// ==========================================
+// ELECTRICAL POWER CALCULATOR
+// ==========================================
+console.log("Electrical Power Calculator loaded");
+
+console.log("Power system:", document.getElementById("powerSystem"));
+console.log("Calculate button:", document.getElementById("powerCalculateBtn"));
+console.log("Result element:", document.getElementById("powerResult"));
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const system = document.getElementById("powerSystem");
+    const voltage = document.getElementById("powerVoltage");
+    const current = document.getElementById("powerCurrent");
+    const pf = document.getElementById("powerPF");
+    const powerType = document.getElementById("powerType");
+
+    const button = document.getElementById("powerCalculateBtn");
+    const result = document.getElementById("powerResult");
+    const triangle = document.getElementById("powerTriangle");
+
+    // UPDATE POWER FACTOR TYPE
+    pf.addEventListener("input", function () {
+
+        const value = Number(pf.value);
+
+        if (value === 1) {
+            powerType.value = "unity";
+            powerType.disabled = true;
+        } else {
+            powerType.disabled = false;
+
+            if (powerType.value === "unity") {
+                powerType.value = "lagging";
+            }
+        }
+
+    });
+
+    // CALCULATE ELECTRICAL POWER
+    button.addEventListener("click", function () {
+        console.log("Calculate button clicked!");
+
+        const V = Number(voltage.value);
+        const I = Number(current.value);
+        const PF = Number(pf.value);
+
+        // INPUT VALIDATION
+        if (
+            voltage.value.trim() === "" ||
+            current.value.trim() === "" ||
+            pf.value.trim() === ""
+        ) {
+            result.textContent = "Please fill in all required fields.";
+            triangle.innerHTML = "";
+            return;
+        }
+
+        if (
+            !Number.isFinite(V) ||
+            !Number.isFinite(I) ||
+            !Number.isFinite(PF) ||
+            V <= 0 ||
+            I <= 0 ||
+            PF <= 0 ||
+            PF > 1
+        ) {
+            result.textContent = "Please enter valid positive values. Power factor must be between 0 and 1.";
+            triangle.innerHTML = "";
+            return;
+        }
+
+        // CALCULATE APPARENT POWER
+        let S;
+
+        if (system.value === "single") {
+
+            S = V * I;
+
+        } else {
+
+            S = Math.sqrt(3) * V * I;
+
+        }
+
+        // CALCULATE ACTIVE POWER
+        const P = S * PF;
+
+        // CALCULATE REACTIVE POWER MAGNITUDE
+        const Q = Math.sqrt(Math.max(0, S * S - P * P));
+
+        // CALCULATE PHASE ANGLE
+        const angle = Math.acos(PF) * (180 / Math.PI);
+
+        // DETERMINE LEADING OR LAGGING
+        const type = PF === 1 ? "unity" : powerType.value;
+
+        const reactivePower = type === "leading" ? -Q : Q;
+
+        // CONVERT TO PRACTICAL UNITS
+        const activeKW = P / 1000;
+        const reactiveKVAR = reactivePower / 1000;
+        const apparentKVA = S / 1000;
+
+        // DISPLAY RESULTS
+        result.innerHTML = `
+            <h3>Electrical Power Results</h3>
+
+            <p>
+                Active Power:
+                <strong>${activeKW.toFixed(2)} kW</strong>
+            </p>
+
+            <p>
+                Reactive Power:
+                <strong>${reactiveKVAR.toFixed(2)} kVAR</strong>
+            </p>
+
+            <p>
+                Apparent Power:
+                <strong>${apparentKVA.toFixed(2)} kVA</strong>
+            </p>
+
+            <p>
+                Power Factor:
+                <strong>${PF.toFixed(3)}</strong>
+            </p>
+
+            <p>
+                Phase Angle:
+                <strong>${angle.toFixed(2)}°</strong>
+            </p>
+
+            <p>
+                Power Factor Type:
+                <strong>${type.toUpperCase()}</strong>
+            </p>
+        `;
+
+        // POWER TRIANGLE
+        const direction = type === "leading" ? -1 : 1;
+
+        triangle.innerHTML = `
+            <h3>Power Triangle</h3>
+
+            <svg viewBox="0 0 320 220"
+                 width="100%"
+                 role="img"
+                 aria-label="Power triangle showing active power, reactive power and apparent power">
+
+                <line x1="40" y1="175"
+                      x2="270" y2="175"
+                      stroke="black"
+                      stroke-width="2"/>
+
+                <line x1="270" y1="175"
+                      x2="270" y2="${175 - direction * Math.min(Q / S * 120, 120)}"
+                      stroke="black"
+                      stroke-width="2"/>
+
+                <line x1="40" y1="175"
+                      x2="270" y2="${175 - direction * Math.min(Q / S * 120, 120)}"
+                      stroke="blue"
+                      stroke-width="3"/>
+
+                <text x="140" y="198" font-size="12">
+                    P = ${activeKW.toFixed(2)} kW
+                </text>
+
+                <text x="275" y="${direction === 1 ? 110 : 205}"
+                      font-size="12">
+                    Q = ${Math.abs(reactiveKVAR).toFixed(2)} kVAR
+                </text>
+
+                <text x="105" y="${direction === 1 ? 115 : 215}"
+                      font-size="12">
+                    S = ${apparentKVA.toFixed(2)} kVA
+                </text>
+
+            </svg>
+
+            <small>
+                ${type === "leading"
+                    ? "Reactive power is negative (leading)."
+                    : type === "lagging"
+                    ? "Reactive power is positive (lagging)."
+                    : "Unity power factor: reactive power is zero."}
+            </small>
+        `;
+
+    });
+
+});
