@@ -729,3 +729,107 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+// ==========================================
+// ENERGY CONSUMPTION & COST CALCULATOR
+// ==========================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const appliance = document.getElementById("energyAppliance");
+    const power = document.getElementById("energyPower");
+    const unit = document.getElementById("energyUnit");
+    const quantity = document.getElementById("energyQuantity");
+    const hours = document.getElementById("energyHours");
+    const days = document.getElementById("energyDays");
+    const tariff = document.getElementById("energyTariff");
+
+    const button = document.getElementById("energyCalculateBtn");
+    const result = document.getElementById("energyResult");
+
+    button.addEventListener("click", function () {
+
+        const P = Number(power.value);
+        const N = Number(quantity.value);
+        const H = Number(hours.value);
+        const D = Number(days.value);
+        const T = Number(tariff.value);
+
+        // VALIDATION
+        if (
+            power.value.trim() === "" ||
+            hours.value.trim() === "" ||
+            tariff.value.trim() === ""
+        ) {
+            result.innerHTML = "Please fill in all required fields.";
+            return;
+        }
+
+        if (
+            P <= 0 ||
+            N <= 0 ||
+            H <= 0 ||
+            H > 24 ||
+            D <= 0 ||
+            D > 31 ||
+            T < 0
+        ) {
+            result.innerHTML = "Please enter valid values.";
+            return;
+        }
+
+      // CONVERT POWER TO kW
+let powerKW;
+
+if (unit.value === "W") {
+    powerKW = P / 1000;
+} else if (unit.value === "kW") {
+    powerKW = P;
+} else if (unit.value === "HP") {
+    powerKW = P * 0.746;
+}
+        // TOTAL CONNECTED LOAD
+        const totalPower = powerKW * N;
+
+        // ENERGY CALCULATIONS
+        const dailyEnergy = totalPower * H;
+        const monthlyEnergy = dailyEnergy * D;
+        const annualEnergy = dailyEnergy * 365;
+
+        // COST CALCULATIONS
+        const dailyCost = dailyEnergy * T;
+        const monthlyCost = monthlyEnergy * T;
+        const annualCost = annualEnergy * T;
+
+        // DISPLAY RESULTS
+        result.innerHTML = `
+            <h3>Energy Consumption Results</h3>
+
+            <p>Appliance: <strong>${appliance.value || "Electrical Load"}</strong></p>
+
+            <p>Total Connected Load:
+            <strong>${totalPower.toFixed(2)} kW</strong></p>
+
+            <p>Daily Energy Consumption:
+            <strong>${dailyEnergy.toFixed(2)} kWh</strong></p>
+
+            <p>Monthly Energy Consumption:
+            <strong>${monthlyEnergy.toFixed(2)} kWh</strong></p>
+
+            <p>Annual Energy Consumption:
+            <strong>${annualEnergy.toFixed(2)} kWh</strong></p>
+
+            <hr>
+
+            <p>Daily Electricity Cost:
+            <strong>${dailyCost.toLocaleString("en-US", {maximumFractionDigits: 2})} TZS</strong></p>
+
+            <p>Monthly Electricity Cost:
+            <strong>${monthlyCost.toLocaleString("en-US", {maximumFractionDigits: 2})} TZS</strong></p>
+
+            <p>Annual Electricity Cost:
+            <strong>${annualCost.toLocaleString("en-US", {maximumFractionDigits: 2})} TZS</strong></p>
+        `;
+
+    });
+
+});
